@@ -2,38 +2,28 @@
 // TODAY PAGE
 // ============================================================
 function todayDue() {
-  var now = new Date();
-  return S.aqsat.filter(function(c) {
+  const now = new Date();
+  return S.aqsat.filter(c => {
     if (aqDone(c) || !c.price) return false;
     if (aqPaidCount(c) >= c.months) return false;
-
-    // Parse start date
-    var startStr   = c.startDate || ((c.startMonth || todayStr.slice(0,7)) + '-01');
-    var startD     = new Date(startStr);
-
+    // Use startDate for day-based calculation
+    const startStr  = c.startDate || (c.startMonth + '-01') || todayStr;
+    const startD    = new Date(startStr);
+    const dayOfMonth = startD.getDate(); // day installment is due each month
     // First installment due = 1 month after purchase
-    var firstDue   = new Date(startD);
+    const firstDue  = new Date(startD);
     firstDue.setMonth(firstDue.getMonth() + 1);
-
-    // Count how many installments due by END of today
-    var expected   = 0;
-    var dueDate    = new Date(firstDue);
-    while (dueDate <= now && expected < c.months) {
-      expected++;
-      dueDate.setMonth(dueDate.getMonth() + 1);
-    }
-
-    // Due TODAY = exactly one more expected than paid, and next due is today
-    var paid       = aqPaidCount(c);
-    var nextDue    = new Date(firstDue);
-    nextDue.setMonth(nextDue.getMonth() + paid);
-
-    return (
-      paid < expected && paid < c.months &&
-      nextDue.getDate()    === now.getDate() &&
-      nextDue.getMonth()   === now.getMonth() &&
-      nextDue.getFullYear()=== now.getFullYear()
-    );
+    // How many installments expected by now?
+    const [sy, sm]  = (startStr.slice(0,7)).split('-').map(Number);
+    const nowY = now.getFullYear(), nowM = now.getMonth() + 1, nowD = now.getDate();
+    let expected = (nowY - sy) * 12 + (nowM - sm);
+    // If today's date < day of installment, this month's not due yet
+    if (nowD < dayOfMonth) expected -= 1;
+    expected = Math.max(0, Math.min(expected, c.months));
+    const paid = aqPaidCount(c);
+    // Due today = exactly 1 behind (this month's installment is due)
+    const slot = (nowY - 2020) * 12 + nowM - ((sy - 2020) * 12 + sm);
+    return paid < slot && paid < c.months && slot <= c.months;
   });
 }
 
@@ -954,11 +944,8 @@ function getVisibleAqsatList() {
     const inst = aqInst(c);
     const gross = aqGross(c);
     const pct  = gross > 0 ? (gross - rem) / gross : (done ? 1 : 0);
-    // Day-based expected
-    const _glStartD = new Date(c.startDate || ((c.startMonth||'2024-01')+'-01'));
-    const _glFirstD = new Date(_glStartD); _glFirstD.setMonth(_glFirstD.getMonth()+1);
-    var expected = 0; var _glDue = new Date(_glFirstD);
-    while(_glDue <= now && expected < c.months){ expected++; _glDue.setMonth(_glDue.getMonth()+1); }
+    const [sy, sm] = ((c.startDate||c.startMonth||'2024-01').slice(0,7)).split('-').map(Number);
+    const expected = Math.min(c.months, (now.getFullYear()-2020)*12+(now.getMonth()+1)-((sy-2020)*12+sm)+1);
     const lateMonths = late ? Math.max(0, expected - aqPaidCount(c)) : 0;
     return { c, late, done, rem, inst, gross, pct, lateMonths };
   });
@@ -1116,58 +1103,21 @@ function aqCard(c) {
   const initials = c.name.trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2);
   const colors = ['linear-gradient(135deg,#5B7FFF,#3A5CE5)','linear-gradient(135deg,#00D4C8,#0891B2)','linear-gradient(135deg,#B07FFF,#7C3AED)','linear-gradient(135deg,#FFB020,#EA580C)','linear-gradient(135deg,#20D068,#059669)','linear-gradient(135deg,#FF4D6A,#BE123C)'];
   const col = colors[c.id % colors.length];
-  // Day-based expected count (same logic as aqLate)
-  const _startStr2 = c.startDate || ((c.startMonth||'2024-01') + '-01');
-  const _startD2   = new Date(_startStr2);
-  const _firstDue2 = new Date(_startD2);
-  _firstDue2.setMonth(_firstDue2.getMonth() + 1);
-  const now2 = new Date();
-  var expected2 = 0;
-  var _due2 = new Date(_firstDue2);
-  while (_due2 <= now2 && expected2 < c.months) { expected2++; _due2.setMonth(_due2.getMonth() + 1); }
+  const now2 = new Date(); const [sy2,sm2] = ((c.startDate||c.startMonth||'2024-01').slice(0,7)).split('-').map(Number);
+  const expected2 = Math.min(c.months,(now2.getFullYear()-2020)*12+(now2.getMonth()+1)-((sy2-2020)*12+sm2)+1);
   const lateM = late ? Math.max(0, expected2 - paid) : 0;
   const lateBadge = lateM > 1 ? ` <span class="badge" style="background:rgba(255,77,106,.18);color:var(--red);border:1px solid var(--rborder);font-size:10px">${lateM} شهر</span>` : '';
-  // Calculate next due date
-  const _nextDueDate = (function() {
-    if (done) return null;
-    var nd = new Date(_firstDue2);
-    nd.setMonth(nd.getMonth() + paid);
-    return nd;
-  })();
-  const _nextDueStr = _nextDueDate ? _nextDueDate.toLocaleDateString('ar-EG', {day:'numeric',month:'long'}) : '';
-  const _daysUntil  = _nextDueDate ? Math.ceil((_nextDueDate - now2) / (1000*60*60*24)) : null;
-  const _dueLabel   = _daysUntil !== null
-    ? (_daysUntil === 0 ? ' · <span style="color:var(--amber)">اليوم!</span>'
-      : _daysUntil > 0 ? ` · <span style="color:var(--text3);font-size:10px">بعد ${_daysUntil} يوم</span>`
-      : '')
-    : '';
-  const statusBadge = done
-    ? '<span class="badge badge-g"><i class="ti ti-check"></i> مكتمل</span>'
-    : late
-    ? `<span class="badge badge-r"><i class="ti ti-clock"></i> متأخر</span>${lateBadge}`
-    : `<span class="badge badge-b"><i class="ti ti-loader"></i> نشط</span>${_dueLabel}`;
-
-  // Calculate slotNow using day-based logic
-  const _instStartStr = c.startDate || ((c.startMonth||'2024-01') + '-01');
-  const _instStartD   = new Date(_instStartStr);
-  const _instFirstDue = new Date(_instStartD);
-  _instFirstDue.setMonth(_instFirstDue.getMonth() + 1);
-  const _instNow = new Date();
-  var _instExpected = 0;
-  var _instDue = new Date(_instFirstDue);
-  while (_instDue <= _instNow && _instExpected < c.months) {
-    _instExpected++;
-    _instDue.setMonth(_instDue.getMonth() + 1);
-  }
-  const _slotNow = _instExpected; // number of slots that should be paid by now
+  const statusBadge = done ? '<span class="badge badge-g"><i class="ti ti-check"></i> مكتمل</span>' : late ? `<span class="badge badge-r"><i class="ti ti-clock"></i> متأخر</span>${lateBadge}` : '<span class="badge badge-b"><i class="ti ti-loader"></i> نشط</span>';
 
   const instBoxes = c.price>0 ? Array.from({length:c.months},function(_,i){
+    var now2=new Date(), _sm=(c.startDate||c.startMonth||'2024-01').slice(0,7).split('-'), sy2=parseInt(_sm[0]), sm2=parseInt(_sm[1]);
+    var slotNow=(now2.getFullYear()-2020)*12+(now2.getMonth()+1)-((sy2-2020)*12+sm2);
     var paidAmt = aqPaidAmt(c,i);
     var inst2   = aqInst(c);
     var full    = aqSlotDone(c,i);
     var partial = paidAmt > 0 && !full;
-    var overdue = !full && i < _slotNow;
-    var current = i === _slotNow && !full;
+    var overdue = !full && i < slotNow;
+    var current = i === slotNow && !full;
     var pct     = inst2 > 0 ? Math.min(100, Math.round(paidAmt/inst2*100)) : 0;
     var bgColor = full?'var(--gbg)':partial?'var(--abg)':overdue?'var(--rbg)':current?'var(--bbg)':'var(--bg3)';
     var bdrColor= full?'var(--gborder)':partial?'var(--aborder)':overdue?'var(--rborder)':current?'var(--bborder)':'var(--border)';
@@ -1793,13 +1743,10 @@ async function exportClientPDF(id) {
     const slotDone  = aqSlotDone(c, i);
     const partial   = paidAmt > 0 && !slotDone;
     const now2 = new Date();
-    // Day-based slotNow
-    const _cdStartD = new Date(c.startDate || ((c.startMonth||'2024-01')+'-01'));
-    const _cdFirstD = new Date(_cdStartD); _cdFirstD.setMonth(_cdFirstD.getMonth()+1);
-    var slotNow = 0; var _cdDue = new Date(_cdFirstD);
-    while(_cdDue <= now2 && slotNow < c.months){ slotNow++; _cdDue.setMonth(_cdDue.getMonth()+1); }
-    const overdue   = !slotDone && i < _slotNow;
-    const isCurrent = i === _slotNow && !slotDone;
+    const [sy2, sm2] = ((c.startDate||c.startMonth||'2024-01').slice(0,7)).split('-').map(Number);
+    const slotNow = (now2.getFullYear() - 2020) * 12 + (now2.getMonth() + 1) - ((sy2 - 2020) * 12 + sm2);
+    const overdue   = !slotDone && i < slotNow;
+    const isCurrent = i === slotNow && !slotDone;
 
     // حساب تاريخ الشهر
     const slotDate = new Date(sy2, sm2 - 1 + i);
@@ -2078,11 +2025,7 @@ function showLateNotif() {
     const col = colors[c.id % colors.length];
     const lateMonths = type==='late' ? (() => {
       const now=new Date(), [sy,sm]=((c.startDate||c.startMonth||'2024-01').slice(0,7)).split('-').map(Number);
-      // Day-based
-      var _nExp=0, _nDue=new Date(c.startDate||((c.startMonth||'2024-01')+'-01'));
-      _nDue.setMonth(_nDue.getMonth()+1);
-      while(_nDue<=now&&_nExp<c.months){_nExp++;_nDue.setMonth(_nDue.getMonth()+1);}
-      const expected=_nExp;
+      const expected=Math.min(c.months,(now.getFullYear()-2020)*12+(now.getMonth()+1)-((sy-2020)*12+sm)+1);
       return Math.max(0, expected - paid);
     })() : 0;
     return `<div class="notif-item ${type}" onclick="closeNotif();openClientDetail(${c.id})" style="cursor:pointer">
@@ -4005,12 +3948,8 @@ function renderClientDetail(c) {
 
   // ── تنبيه ذكي مخصص ────────────────────────────────────────
   const now = new Date();
-  // Day-based slotNow for card
-  const _csStartD = new Date(c.startDate || ((c.startMonth||'2024-01')+'-01'));
-  const _csFirstD = new Date(_csStartD); _csFirstD.setMonth(_csFirstD.getMonth()+1);
-  const now = new Date();
-  var slotNow = 0; var _csDue = new Date(_csFirstD);
-  while(_csDue <= now && slotNow < c.months){ slotNow++; _csDue.setMonth(_csDue.getMonth()+1); }
+  const [sy, sm] = ((c.startDate||c.startMonth||'2024-01').slice(0,7)).split('-').map(Number);
+  const slotNow = (now.getFullYear()-2020)*12+(now.getMonth()+1)-((sy-2020)*12+sm);
   const lateMonths = late ? Math.max(0, Math.min(slotNow, c.months-1) - paid + 1) : 0;
 
   let alertHTML = '';
@@ -4064,16 +4003,13 @@ function renderClientDetail(c) {
 
   // ── Installment boxes ──────────────────────────────────────
   const instBoxes = c.price > 0 ? Array.from({length: c.months}, (_, i) => {
-    // Day-based slotNow2
-    var slotNow2=0; var _s2d=new Date(c.startDate||((c.startMonth||'2024-01')+'-01'));
-    _s2d.setMonth(_s2d.getMonth()+1);
-    while(_s2d<=now&&slotNow2<c.months){slotNow2++;_s2d.setMonth(_s2d.getMonth()+1);}
+    const slotNow2 = (now.getFullYear()-2020)*12+(now.getMonth()+1)-((sy-2020)*12+sm);
     const paidAmt  = aqPaidAmt(c, i);
     const instAmt  = aqInst(c);
     const full     = aqSlotDone(c, i);
     const partial  = paidAmt > 0 && !full;
-    const overdue  = !full && i < _slotNow2;
-    const current  = i === _slotNow2 && !full;
+    const overdue  = !full && i < slotNow2;
+    const current  = i === slotNow2 && !full;
     const pctSlot  = instAmt > 0 ? Math.min(100, Math.round(paidAmt / instAmt * 100)) : 0;
     const label    = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
     const monthIdx = (sm - 1 + i) % 12;

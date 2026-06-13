@@ -45,25 +45,21 @@ const aqDone     = function(c) { return c.price > 0 && aqRem(c) <= 0; };
 const aqTotalInt = function(c) { return c.price > 0 ? Math.max(0, aqGross(c) - (c.price - c.down)) : 0; };
 const aqLate = function(c) {
   if (aqDone(c) || !c.price) return false;
-  var now      = new Date();
-  // Parse start date — first installment due exactly 1 month after purchase day
-  var startStr = c.startDate || ((c.startMonth || todayStr.slice(0,7)) + '-01');
+  var now = new Date();
+  // Use startDate if available (full date), else fall back to startMonth
+  var startStr = c.startDate || (c.startMonth + '-01');
   var startD   = new Date(startStr);
-  var dayOfMonth = startD.getDate(); // e.g. 15 → installment due on 15th each month
-
-  // First installment due = 1 month after startDate
+  // First installment due = startDate + 1 month
+  // Calculate how many installments should have been paid by now
   var firstDue = new Date(startD);
   firstDue.setMonth(firstDue.getMonth() + 1);
-
-  // How many installments should have been paid by now?
-  // Each installment is due on dayOfMonth, starting from firstDue
-  var expected = 0;
-  var dueDate  = new Date(firstDue);
-  while (dueDate <= now && expected < c.months) {
-    expected++;
-    dueDate.setMonth(dueDate.getMonth() + 1);
-  }
-
+  var sy = startD.getFullYear(), sm = startD.getMonth() + 1;
+  var startIdx = (sy - 2020) * 12 + sm;
+  // Adjust: due date is day of purchase next month
+  var nowIdx   = (now.getFullYear() - 2020) * 12 + (now.getMonth() + 1);
+  // If today is before the day of month of purchase, subtract 1 (not due yet this month)
+  if (now.getDate() < startD.getDate()) nowIdx -= 1;
+  var expected = Math.min(nowIdx - startIdx, c.months);
   return aqPaidCount(c) < expected;
 };
 
