@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>نظام المحل PRO</title>
+  <meta name="theme-color" content="#080C14">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="نظام المحل">
+  <link rel="manifest" href="data:application/json,{%22name%22:%22%D9%86%D8%B8%D8%A7%D9%85%20%D8%A7%D9%84%D9%85%D8%AD%D9%84%20PRO%22,%22short_name%22:%22%D9%86%D8%B8%D8%A7%D9%85%20%D8%A7%D9%84%D9%85%D8%AD%D9%84%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23080C14%22,%22theme_color%22:%22%235B7FFF%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20100%20100%27%3E%3Crect%20width=%27100%27%20height=%27100%27%20rx=%2720%27%20fill=%27%235B7FFF%27/%3E%3Ctext%20y=%27.9em%27%20font-size=%2780%27%20text-anchor=%27middle%27%20x=%2750%27%3E%F0%9F%8F%AA%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22any%22,%22type%22:%22image/svg+xml%22}]}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-layout">
+
+<!-- ══════════════════════════════════════════════════════════
+     SITE GATE — حماية الموقع
+═══════════════════════════════════════════════════════════ -->
+<div id="site-gate">
+  <div class="gate-card">
+    <div class="gate-logo">🏪 نظام المحل</div>
+    <div class="gate-sub">أدخل كلمة المرور للدخول</div>
+    <input id="gate-input" class="gate-input" type="password"
+           placeholder="••••" maxlength="10"
+           onkeydown="if(event.key==='Enter') gateSubmit()" autofocus>
+    <div class="gate-err" id="gate-err"></div>
+    <button class="gate-btn" onclick="gateSubmit()">
+      <i class="ti ti-lock-open"></i> دخول
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     LOCK SCREEN
+═══════════════════════════════════════════════════════════ -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-logo"><i class="ti ti-lock"></i></div>
+    <div class="lock-title">نظام المحل</div>
+    <div class="lock-sub">MALAK SHOP · PRO</div>
+    <div class="lock-clock" id="lock-clock"></div>
+    <div class="lock-dots">
+      <div class="lock-dot" id="ld0"></div>
+      <div class="lock-dot" id="ld1"></div>
+      <div class="lock-dot" id="ld2"></div>
+      <div class="lock-dot" id="ld3"></div>
+    </div>
+    <div class="lock-input-wrap">
+      <input id="lock-pin" class="lock-input" type="password" maxlength="4"
+             placeholder="● ● ● ●" autocomplete="off" inputmode="numeric">
+      <button class="lock-eye" id="lock-eye-btn">
+        <i class="ti ti-eye-off" id="lock-eye-icon"></i>
+      </button>
+    </div>
+    <div class="lock-err" id="lock-err"></div>
+    <button class="lock-btn" id="lock-btn"><i class="ti ti-login"></i> دخول</button>
+    <div class="lock-hint" id="lock-hint-area"><i class="ti ti-shield-lock"></i> <span id="lock-hint-text">محمي ومشفر</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     APP LAYOUT
+═══════════════════════════════════════════════════════════ -->
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">🏪</div>
+    <div class="sidebar-logo-name">نظام المحل</div>
+    <div class="sidebar-logo-sub">MALAK SHOP PRO</div>
+  </div>
+
+  <div class="sidebar-nav">
+    <button class="snav-item active" onclick="sidebarNav('pg-today',this)"><i class="ti ti-sun"></i> اليوم</button>
+    <button class="snav-item" onclick="sidebarNav('pg-home',this)"><i class="ti ti-layout-dashboard"></i> الرئيسية</button>
+    <button class="snav-item" onclick="sidebarNav('pg-daily',this)"><i class="ti ti-file-invoice"></i> اليومية</button>
+    <button class="snav-item" onclick="sidebarNav('pg-aqsat',this)"><i class="ti ti-calendar-repeat"></i> الأقساط</button>
+    <button class="snav-item" onclick="sidebarNav('pg-bore',this)"><i class="ti ti-arrow-up-circle"></i> فلوس بره</button>
+    <button class="snav-item" onclick="sidebarNav('pg-qorod',this)"><i class="ti ti-coins"></i> قروض</button>
+    <button class="snav-item" onclick="sidebarNav('pg-doyon',this)"><i class="ti ti-receipt"></i> ديون</button>
+    <div class="sidebar-sep"></div>
+    <button class="snav-item" onclick="sidebarNav('pg-reports',this)"><i class="ti ti-chart-pie"></i> تقارير</button>
+    <button class="snav-item" onclick="sidebarNav('pg-overview',this)"><i class="ti ti-layout-dashboard"></i> مركزي</button>
+    <button class="snav-item" onclick="sidebarNav('pg-recurring',this)"><i class="ti ti-repeat"></i> متكرر</button>
+    <button class="snav-item" onclick="sidebarNav('pg-calc',this)"><i class="ti ti-calculator"></i> حاسبة</button>
+  </div>
+
+  <div class="sidebar-bottom">
+    <!-- Theme toggle -->
+    <div style="padding:8px 14px 4px">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--sidebar-hover,rgba(255,255,255,.04));border-radius:10px;padding:6px 10px">
+        <button onclick="toggleTheme()" id="sidebar-theme-btn"
+          style="background:none;border:none;cursor:pointer;font-size:11px;font-weight:700;color:var(--sidebar-text2,#8b949e);font-family:'Cairo',sans-serif;display:flex;align-items:center;gap:5px">
+          <i class="ti ti-sun" id="sidebar-theme-icon" style="font-size:14px"></i>
+          <span id="sidebar-theme-label">فاتح</span>
+        </button>
+        <div style="font-size:9px;color:var(--sidebar-text3,#484f58)">المظهر</div>
+      </div>
+    </div>
+    <div class="sidebar-sep"></div>
+    <button class="snav-item" onclick="sidebarNav('pg-settings',this)"><i class="ti ti-settings"></i> الإعدادات</button>
+    <button class="snav-item" onclick="lockNow()"><i class="ti ti-lock"></i> قفل</button>
+  </div>
+</div>
+
+<!-- MAIN AREA -->
+<div class="main-area" id="main-area">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-right" style="display:flex;align-items:center;gap:8px">
+    <div id="fb-status" style="display:flex;align-items:center;gap:4px;padding:0 8px;opacity:.8">
+      <i class="ti ti-cloud-off" style="font-size:14px;color:var(--text3)"></i>
+      <span style="font-size:11px;color:var(--text3);font-weight:700">غير متصل</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openSearch()" title="بحث موحد (Ctrl+F)" id="search-trigger">
+      <i class="ti ti-search"></i>
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="set-theme-btn" title="تغيير المظهر">
+      <i class="ti ti-sun" id="set-theme-icon"></i>
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="togglePrivacy()" title="إخفاء الأرقام" id="topbar-privacy">
+      <i class="ti ti-eye" id="privacy-icon"></i>
+    </button>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <!-- hamburger for mobile -->
+    <button class="btn btn-ghost btn-sm hamburger" style="display:none" onclick="openSidebar()">
+      <i class="ti ti-menu-2"></i>
+    </button>
+    <div style="text-align:right">
+      <div class="topbar-page-title" id="topbar-page-title">اليوم</div>
+      <div class="topbar-page-date" id="topbar-page-date"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     NAVTABS
+═══════════════════════════════════════════════════════════ -->
+<div class="navtabs">
+  <button class="ntab active" onclick="nav('pg-today')"><i class="ti ti-sun"></i> اليوم</button>
+  <button class="ntab" onclick="nav('pg-home')"><i class="ti ti-layout-dashboard"></i> الرئيسية</button>
+  <button class="ntab" onclick="nav('pg-daily')"><i class="ti ti-file-invoice"></i> اليومية</button>
+  <button class="ntab" onclick="nav('pg-aqsat')"><i class="ti ti-calendar-repeat"></i> الأقساط</button>
+  <button class="ntab" onclick="nav('pg-bore')"><i class="ti ti-arrow-up-circle"></i> فلوس بره</button>
+  <button class="ntab" onclick="nav('pg-qorod')"><i class="ti ti-coins"></i> قروض</button>
+  <button class="ntab" onclick="nav('pg-doyon')"><i class="ti ti-receipt"></i> ديون</button>
+  <button class="ntab" onclick="nav('pg-reports')"><i class="ti ti-chart-pie"></i> تقارير</button>
+  <button class="ntab" onclick="nav('pg-overview')"><i class="ti ti-layout-dashboard"></i> مركزي</button>
+  <button class="ntab" onclick="nav('pg-recurring')"><i class="ti ti-repeat"></i> متكرر</button>
+  <button class="ntab" onclick="nav('pg-calc')"><i class="ti ti-calculator"></i> حاسبة</button>
+  <button class="ntab" onclick="nav('pg-settings')"><i class="ti ti-settings"></i> إعدادات</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     TODAY PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page active" id="pg-today">
+  <div class="page-header">
+    <div class="page-title"><i class="ti ti-sun"></i> لوحة اليوم</div>
+    <div style="font-size:13px;color:var(--text3);font-weight:600" id="today-date"></div>
+  </div>
+
+  <!-- ── Smart Alerts Banner ── -->
+  <div id="smart-alerts-banner" style="margin-bottom:14px"></div>
+
+  <div class="grid3" id="today-bal" style="margin-bottom:18px"></div>
+
+  <div class="grid2">
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px">
+          <i class="ti ti-bell" style="color:var(--amber)"></i> مستحق اليوم <span id="today-due-count"></span>
+        </div>
+        <button class="wa-btn" onclick="waSendAll()"><i class="ti ti-brand-whatsapp"></i> الكل</button>
+      </div>
+      <div id="today-due"></div>
+    </div>
+    <div>
+      <div style="font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <i class="ti ti-clock" style="color:var(--red)"></i> متأخرين <span id="today-late-count"></span>
+      </div>
+      <div id="today-late"></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:14px">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-list" style="color:var(--blue)"></i> آخر 10 حركات</div>
+      <div id="today-recent"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-plus-circle" style="color:var(--green)"></i> إضافة سريعة</div>
+      <div class="form-grid" style="grid-template-columns:1fr">
+        <div class="fg"><label>البيان</label><input id="tq-name" placeholder="اسم الحركة"></div>
+        <div class="grid2">
+          <div class="fg"><label>المبلغ</label><input type="number" id="tq-amt" placeholder="0"></div>
+          <div class="fg"><label>المصدر</label>
+            <select id="tq-src">
+              <option value="cash">💵 كاش</option>
+              <option value="insta">📱 إنستا</option>
+              <option value="voda">📡 فودافون</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid2">
+          <button class="btn btn-green" onclick="tqAdd('in')"><i class="ti ti-arrow-down-circle"></i> وارد</button>
+          <button class="btn btn-red" onclick="tqAdd('out')"><i class="ti ti-arrow-up-circle"></i> صادر</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     HOME PAGE — داشبورد رئيسي
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-home">
+  <div class="page-header">
+    <div class="page-title"><i class="ti ti-layout-dashboard"></i> الداشبورد</div>
+    <div class="qab">
+      <button class="qab-btn" onclick="openEditBalances()"><i class="ti ti-wallet"></i> الأرصدة</button>
+      <button class="qab-btn" style="background:var(--rbg);border-color:var(--rborder);color:var(--red)" onclick="exportMonthlyPDF()">
+        <i class="ti ti-file-type-pdf"></i> تقرير شهري
+      </button>
+    </div>
+  </div>
+
+  <!-- ── KPI Cards ── -->
+  <div class="grid6" id="home-metrics" style="margin-bottom:16px"></div>
+
+  <!-- ── Week Chart + Who Paid ── -->
+  <div class="grid2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-bar" style="color:var(--accent)"></i> إيرادات الأسبوع</div>
+      <div style="position:relative;height:180px"><canvas id="home-chart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <div id="home-paid-toggle" style="display:flex;gap:4px">
+          <button onclick="homePaidTab('late')" id="hpt-late" class="btn btn-sm" style="background:var(--rbg);color:var(--red);border:1px solid var(--rborder);font-size:11px">⚠️ متأخرين</button>
+          <button onclick="homePaidTab('paid')" id="hpt-paid" class="btn btn-sm btn-ghost" style="font-size:11px">✓ دفعوا اليوم</button>
+        </div>
+        <div><i class="ti ti-users" style="color:var(--teal)"></i> الأقساط</div>
+      </div>
+      <div id="home-paid-list" style="max-height:160px;overflow-y:auto;margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- ── Monthly Summary + Recent Activity ── -->
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <button class="btn btn-ghost btn-sm" onclick="exportMonthlyPDF()" style="font-size:11px">
+          <i class="ti ti-file-type-pdf" style="color:var(--red)"></i> تصدير PDF
+        </button>
+        <div><i class="ti ti-calendar-stats" style="color:var(--purple)"></i> ملخص الشهر الحالي</div>
+      </div>
+      <div id="home-monthly-summary"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-activity" style="color:var(--green)"></i> آخر الحركات</div>
+      <div id="home-recent-activity" style="max-height:180px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     DAILY PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-daily">
+  <div class="page-header">
+    <div class="page-title" style="margin-bottom:0"><i class="ti ti-file-invoice"></i> اليومية</div>
+    <button class="btn btn-ghost btn-sm" onclick="exportDailyExcel()">
+      <i class="ti ti-file-spreadsheet" style="color:var(--green)"></i> تصدير Excel
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-plus" style="color:var(--green)"></i> إضافة حركة</div>
+    <div class="form-grid" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr auto auto">
+      <div class="fg"><label>البيان</label><input id="d-name" placeholder="اسم الحركة"></div>
+      <div class="fg"><label>المصدر</label>
+        <select id="d-src-add">
+          <option value="cash">💵 كاش</option>
+          <option value="insta">📱 إنستا</option>
+          <option value="voda">📡 فودافون</option>
+        </select>
+      </div>
+      <div class="fg"><label>التصنيف</label>
+        <select id="d-affect-add">
+          <option value="">غير مصنف</option>
+          <option value="aqsat">📅 أقساط</option>
+          <option value="doyon">🤝 ديون</option>
+          <option value="qorod">🏦 قروض</option>
+          <option value="bore">🌍 فلوس بره</option>
+          <option value="masarif">🧾 مصاريف</option>
+        </select>
+      </div>
+      <div class="fg"><label>المبلغ</label><input type="number" id="d-amt" placeholder="0"></div>
+      <div class="fg"><label>ملاحظة</label><input id="d-note" placeholder="اختياري"></div>
+      <div class="fg"><label>&nbsp;</label><button class="btn btn-green" onclick="addEntry('in')"><i class="ti ti-arrow-down-circle"></i> وارد</button></div>
+      <div class="fg"><label>&nbsp;</label><button class="btn btn-red" onclick="addEntry('out')"><i class="ti ti-arrow-up-circle"></i> صادر</button></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end">
+    <div class="fg" style="flex:0 0 auto"><label>التاريخ</label><input type="date" id="d-date" onchange="renderAll()"></div>
+    <div class="fg" style="flex:0 0 auto"><label>المصدر</label>
+      <select id="d-src" onchange="renderAll()">
+        <option value="all">الكل</option>
+        <option value="cash">💵 كاش</option>
+        <option value="insta">📱 إنستا</option>
+        <option value="voda">📡 فودافون</option>
+      </select>
+    </div>
+    <div class="fg" style="flex:0 0 auto"><label>النوع</label>
+      <select id="d-type-filter" onchange="renderAll()">
+        <option value="all">الكل</option>
+        <option value="in">⬇️ وارد</option>
+        <option value="out">⬆️ صادر</option>
+      </select>
+    </div>
+    <div class="fg" style="flex:0 0 auto"><label>التصنيف</label>
+      <select id="d-affect-filter" onchange="renderAll()">
+        <option value="all">الكل</option>
+        <option value="aqsat">📅 أقساط</option>
+        <option value="doyon">🤝 ديون</option>
+        <option value="qorod">🏦 قروض</option>
+        <option value="bore">🌍 فلوس بره</option>
+        <option value="masarif">🧾 مصاريف</option>
+        <option value="">❓ غير مصنف</option>
+      </select>
+    </div>
+    <div class="fg" style="flex:1;min-width:160px">
+      <label>بحث</label>
+      <input id="d-search" placeholder="🔍 ابحث في البيان أو المبلغ..." oninput="renderAll()" style="min-width:160px">
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="clearDailyFilters()" style="margin-bottom:1px" title="مسح الفلاتر">
+      <i class="ti ti-filter-off"></i>
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="openEditBalances()" style="margin-bottom:1px">
+      <i class="ti ti-wallet"></i> الأرصدة
+    </button>
+  </div>
+
+  <!-- Balance edit inline panel -->
+  <div id="d-bal-panel" style="margin-bottom:14px">
+    <div class="card" style="margin-bottom:0;background:var(--bg3);border:1px solid var(--border)">
+      <div class="card-title" style="cursor:pointer;user-select:none" onclick="toggleBalPanel()">
+        <i class="ti ti-wallet" style="color:var(--blue)"></i> الرصيد الافتتاحي
+        <span id="bal-quick-preview" style="font-size:12px;color:var(--text3);margin-right:8px"></span>
+        <i class="ti ti-chevron-down" id="bal-panel-chev" style="margin-right:auto;font-size:13px;color:var(--text3);transition:transform .2s;transform:rotate(180deg)"></i>
+      </div>
+      <div id="bal-panel-body">
+        <div class="grid3" style="margin-bottom:10px">
+          <div class="fg">
+            <label>💵 كاش (ج)</label>
+            <input type="number" id="bal-inline-cash" oninput="previewBalance()" placeholder="0">
+          </div>
+          <div class="fg">
+            <label>📱 إنستا (ج)</label>
+            <input type="number" id="bal-inline-insta" oninput="previewBalance()" placeholder="0">
+          </div>
+          <div class="fg">
+            <label>📡 فودافون (ج)</label>
+            <input type="number" id="bal-inline-voda" oninput="previewBalance()" placeholder="0">
+          </div>
+        </div>
+        <div id="bal-preview" style="margin-bottom:10px"></div>
+        <button class="btn btn-primary btn-sm" onclick="saveInlineBalances()">
+          <i class="ti ti-check"></i> حفظ الأرصدة
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid4" id="d-summary" style="margin-bottom:14px"></div>
+  <div id="d-affect-summary"></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>البيان / التصنيف</th><th>المصدر</th><th>النوع</th><th>المبلغ</th><th>الرصيد</th><th></th></tr></thead>
+      <tbody id="d-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     AQSAT PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-aqsat">
+  <div class="page-header">
+    <div class="page-title"><i class="ti ti-calendar-repeat"></i> الأقساط</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="exportAqsatExcel()">
+        <i class="ti ti-file-spreadsheet" style="color:var(--green)"></i> تصدير Excel
+      </button>
+      <button class="btn btn-primary" onclick="openAddAq()"><i class="ti ti-plus"></i> عميل جديد</button>
+    </div>
+  </div>
+
+  <div id="aq-metrics" style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:14px"></div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <input id="aq-search" placeholder="🔍 بحث باسم العميل أو السلعة..." style="flex:1;min-width:200px" oninput="renderAll()">
+    <select id="aq-filter" onchange="renderAll()" style="width:auto">
+      <option value="all">الكل</option>
+      <option value="active">نشط</option>
+      <option value="late">متأخر</option>
+      <option value="done">منتهي</option>
+    </select>
+    <select id="aq-sort" onchange="renderAll()" style="width:auto">
+      <option value="smart">ترتيب ذكي (متأخر أول)</option>
+      <option value="name">الاسم أ-ي</option>
+      <option value="rem_desc">أعلى متبقي أول</option>
+      <option value="rem_asc">أقل متبقي أول</option>
+      <option value="inst_desc">أعلى قسط أول</option>
+      <option value="date_desc">أحدث إضافة</option>
+      <option value="pct_asc">الأقل سداداً أول</option>
+    </select>
+  </div>
+
+  <div id="aq-bulk-bar"></div>
+  <div id="aq-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     BORE PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-bore">
+  <div class="page-header">
+    <div class="page-title"><i class="ti ti-arrow-up-circle" style="color:var(--blue)"></i> فلوس بره</div>
+    <div class="qab">
+      <button class="qab-btn" style="background:var(--bbg);color:var(--blue);border-color:var(--bborder)" onclick="brToggleAdd()">
+        <i class="ti ti-plus"></i> إضافة بند
+      </button>
+    </div>
+  </div>
+
+  <!-- ── KPI Strip ── -->
+  <div id="br-total" style="margin-bottom:16px"></div>
+
+  <!-- ── Add Form (collapsible) ── -->
+  <div class="card" id="br-add-card" style="margin-bottom:16px;display:none;animation:fadeUp .2s ease">
+    <div class="card-title">
+      <i class="ti ti-plus" style="color:var(--blue)"></i> إضافة بند جديد
+      <button class="btn btn-ghost btn-sm" style="margin-right:auto" onclick="brToggleAdd()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg" style="position:relative">
+        <label>الاسم</label>
+        <input id="br-name" placeholder="اسم الشخص أو البند" autocomplete="off"
+          oninput="autocomplete('br-name','br-name-sug')" onkeydown="acKeydown(event,'br-name-sug')">
+        <div id="br-name-sug" class="ac-dropdown"></div>
+      </div>
+      <div class="fg">
+        <label>المبلغ</label>
+        <input type="number" id="br-amt" placeholder="0" inputmode="numeric">
+      </div>
+      <div class="fg">
+        <label>الفئة</label>
+        <select id="br-cat-add">
+          <option>قرض أعطيته</option>
+          <option>بضاعة</option>
+          <option>جمعية</option>
+          <option>مصاريف</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>التاريخ</label>
+        <input type="date" id="br-date-add">
+      </div>
+      <div class="fg" style="grid-column:1/-1">
+        <label>ملاحظة (اختياري)</label>
+        <input id="br-note" placeholder="...">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="addBore()">
+      <i class="ti ti-plus"></i> إضافة
+    </button>
+  </div>
+
+  <!-- ── Filter Bar ── -->
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+    <input id="br-search" placeholder="🔍 بحث بالاسم..." style="flex:1;min-width:140px" oninput="renderBore()">
+    <select id="br-cat" onchange="renderBore()" style="width:auto">
+      <option value="all">كل الفئات</option>
+      <option>قرض أعطيته</option>
+      <option>بضاعة</option>
+      <option>جمعية</option>
+      <option>مصاريف</option>
+      <option>أخرى</option>
+    </select>
+  </div>
+
+  <div class="bulk-table-bar" id="br-bulk-bar"></div>
+  <div id="br-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     BORE DETAIL PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-br-detail">
+  <div id="br-detail-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     QOROD PAGE  (v3 — قروض ليك بره — فايدة ثابتة)
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-qorod">
+  <div class="page-header">
+    <div class="page-title"><i class="ti ti-coins" style="color:var(--green)"></i> قروض ليك بره</div>
+    <button class="btn btn-ghost btn-sm" onclick="qrWaSendAll()">
+      <i class="ti ti-brand-whatsapp" style="color:#25D366"></i> تذكير الكل
+    </button>
+  </div>
+
+  <div class="grid4" id="qr-metrics" style="margin-bottom:18px"></div>
+  <div id="qr-late-banner"></div>
+
+  <div class="card" id="qr-add-card">
+    <div class="card-title" style="cursor:pointer;user-select:none" onclick="qrToggleAddForm()">
+      <i class="ti ti-plus" style="color:var(--green)"></i> إضافة قرض جديد
+      <i class="ti ti-chevron-down" id="qr-add-chevron" style="margin-right:auto;font-size:14px;color:var(--text3);transition:transform .2s"></i>
+    </div>
+    <div id="qr-add-body">
+      <div class="form-grid" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr auto">
+        <div class="fg"><label>اسم الشخص</label><input id="qr-name" placeholder="الاسم"></div>
+        <div class="fg"><label>التليفون</label><input id="qr-phone" placeholder="01xxxxxxxxx" inputmode="tel"></div>
+        <div class="fg"><label>المبلغ الأصلي (ج)</label><input type="number" id="qr-orig" placeholder="0" inputmode="numeric"></div>
+        <div class="fg"><label>فايدة ثابتة/شهر (ج)</label><input type="number" id="qr-monthly-fixed" placeholder="0" inputmode="numeric"></div>
+        <div class="fg"><label>تاريخ القرض</label><input type="date" id="qr-start-date"></div>
+        <div class="fg"><label>&nbsp;</label>
+          <button class="btn btn-green" style="white-space:nowrap" onclick="addQorod()">
+            <i class="ti ti-plus"></i> إضافة
+          </button>
+        </div>
+      </div>
+      <div class="fg" style="margin-top:8px"><label>ملاحظة (اختياري)</label><input id="qr-note" placeholder="..."></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+    <input id="qr-search" placeholder="🔍 بحث بالاسم..." style="flex:1;min-width:160px" oninput="renderQorod()">
+    <select id="qr-filter-status" onchange="renderQorod()" style="width:auto">
+      <option value="all">كل الحالات</option>
+      <option value="active">نشط</option>
+      <option value="late">متأخر</option>
+      <option value="done">منتهي</option>
+    </select>
+  </div>
+
+  <div class="bulk-table-bar" id="qr-bulk-bar"></div>
+  <div id="qr-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     QOROD DETAIL PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-qr-detail">
+  <div id="qr-detail-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     DOYON PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-doyon">
+
+  <!-- ── Header ── -->
+  <div class="page-header">
+    <div>
+      <div class="page-title"><i class="ti ti-arrow-badge-down" style="color:var(--amber)"></i> ديون عليّ</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">فلوس مديونها لحد تاني</div>
+    </div>
+    <div class="qab">
+      <button class="qab-btn" style="background:var(--abg);color:var(--amber);border-color:var(--aborder)" onclick="dyToggleAdd()">
+        <i class="ti ti-plus"></i> إضافة دين
+      </button>
+    </div>
+  </div>
+
+  <!-- ── KPI Cards ── -->
+  <div id="dy-metrics" style="margin-bottom:16px"></div>
+
+  <!-- ── Add Form ── -->
+  <div class="card" id="dy-add-card" style="display:none;margin-bottom:16px;animation:fadeUp .2s ease;border:1.5px solid var(--aborder)">
+    <div class="card-title" style="color:var(--amber)">
+      <i class="ti ti-plus"></i> دين جديد عليّ
+      <button class="btn btn-ghost btn-sm" style="margin-right:auto" onclick="dyToggleAdd()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg" style="grid-column:1/-1;position:relative">
+        <label>اسم الدائن <span style="color:var(--red)">*</span></label>
+        <input id="dy-name" placeholder="مين اللي هتدفعله؟" autocomplete="off"
+          oninput="autocomplete('dy-name','dy-name-sug')" onkeydown="acKeydown(event,'dy-name-sug')">
+        <div id="dy-name-sug" class="ac-dropdown"></div>
+      </div>
+      <div class="fg">
+        <label>المبلغ الأصلي <span style="color:var(--red)">*</span></label>
+        <input type="number" id="dy-orig" placeholder="0" inputmode="numeric">
+      </div>
+      <div class="fg">
+        <label>فايدة شهرية (ج)</label>
+        <input type="number" id="dy-monthly" placeholder="0 = بدون فايدة" inputmode="numeric">
+      </div>
+      <div class="fg">
+        <label>التليفون</label>
+        <input id="dy-phone" placeholder="01xxxxxxxxx" inputmode="tel">
+      </div>
+      <div class="fg">
+        <label>تاريخ الدين</label>
+        <input type="date" id="dy-date">
+      </div>
+      <div class="fg" style="grid-column:1/-1">
+        <label>ملاحظة</label>
+        <input id="dy-note" placeholder="مثلاً: قرض من عمي لشراء بضاعة">
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" style="width:100%;margin-top:8px;padding:12px;background:var(--amber);border-color:var(--amber)" onclick="addDoyon()">
+      <i class="ti ti-plus"></i> إضافة الدين
+    </button>
+  </div>
+
+  <!-- ── Filter ── -->
+  <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+    <input id="dy-search" placeholder="🔍 بحث بالاسم..." style="flex:1;min-width:140px" oninput="renderDoyon()">
+    <select id="dy-filter-status" onchange="renderDoyon()" style="width:auto">
+      <option value="all">الكل</option>
+      <option value="active">نشط</option>
+      <option value="done">منتهي</option>
+    </select>
+  </div>
+
+  <div id="dy-list"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     DOYON DETAIL PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-dy-detail">
+  <div id="dy-detail-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     REPORTS PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-reports">
+  <div class="page-header">
+    <div class="page-title"><i class="ti ti-chart-pie"></i> التقارير</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <select id="rep-year" onchange="renderAll()" style="width:auto"></select>
+      <select id="rep-month" onchange="renderAll()" style="width:auto">
+        <option value="all">كل السنة</option>
+        <option value="1">يناير</option><option value="2">فبراير</option><option value="3">مارس</option>
+        <option value="4">أبريل</option><option value="5">مايو</option><option value="6">يونيو</option>
+        <option value="7">يوليو</option><option value="8">أغسطس</option><option value="9">سبتمبر</option>
+        <option value="10">أكتوبر</option><option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="window.print()"><i class="ti ti-printer"></i> طباعة</button>
+    </div>
+  </div>
+
+  <div class="grid4" id="rep-kpis" style="margin-bottom:18px"></div>
+
+  <div class="grid2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-bar" style="color:var(--accent)"></i> وارد وصادر شهرياً</div>
+      <div style="position:relative;height:220px"><canvas id="rep-monthly"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-pie" style="color:var(--purple)"></i> توزيع المصادر</div>
+      <div style="position:relative;height:220px"><canvas id="rep-src"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:0"><i class="ti ti-list" style="color:var(--blue)"></i> سجل الحركات</div>
+      <span id="rep-log-count" style="font-size:12px;color:var(--text3)"></span>
+    </div>
+    <div class="table-wrap" style="margin-bottom:0">
+      <table>
+        <thead><tr><th>#</th><th>التاريخ</th><th>البيان</th><th>المصدر</th><th>النوع</th><th>المبلغ</th></tr></thead>
+        <tbody id="rep-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Audit Log -->
+  <div class="card" style="margin-top:4px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:0">
+        <i class="ti ti-history" style="color:var(--purple)"></i> سجل التعديلات والحذف
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="clearAuditLog()">
+        <i class="ti ti-trash"></i> مسح السجل
+      </button>
+    </div>
+    <div class="table-wrap" style="margin-bottom:0">
+      <table>
+        <thead><tr><th>الوقت</th><th>العملية</th><th>النوع</th><th>الاسم</th><th>التفاصيل</th></tr></thead>
+        <tbody id="audit-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     OVERVIEW PAGE — المركز المالي الكامل
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-overview">
+  <div class="page-header">
+    <div class="page-title"><i class="ti ti-layout-dashboard" style="color:var(--accent)"></i> المركز المالي الكامل</div>
+    <div style="font-size:11px;color:var(--text3)" id="ov-last-update"></div>
+  </div>
+  <div id="ov-content"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     RECURRING PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-recurring">
+  <div class="page-title" style="margin-bottom:18px"><i class="ti ti-repeat"></i> البنود المتكررة</div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-plus" style="color:var(--teal)"></i> إضافة بند متكرر</div>
+    <div class="form-grid" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr auto">
+      <div class="fg"><label>البيان</label><input id="rec-name" placeholder="مثال: إيجار المحل"></div>
+      <div class="fg"><label>المبلغ</label><input type="number" id="rec-amt" placeholder="0"></div>
+      <div class="fg"><label>النوع</label>
+        <select id="rec-type"><option value="out">صادر</option><option value="in">وارد</option></select>
+      </div>
+      <div class="fg"><label>المصدر</label>
+        <select id="rec-src"><option value="cash">💵 كاش</option><option value="insta">📱 إنستا</option><option value="voda">📡 فودافون</option></select>
+      </div>
+      <div class="fg"><label>التكرار</label>
+        <select id="rec-freq"><option value="monthly">شهري</option><option value="weekly">أسبوعي</option><option value="daily">يومي</option></select>
+      </div>
+      <div class="fg"><label>&nbsp;</label><button class="btn btn-primary" onclick="addRec()"><i class="ti ti-plus"></i></button></div>
+    </div>
+  </div>
+
+  <div class="grid3" id="rec-metrics" style="margin-bottom:14px"></div>
+  <div id="rec-banner"></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>البيان</th><th>المبلغ</th><th>النوع</th><th>التكرار</th><th>آخر تطبيق</th><th>الحالة</th><th></th></tr></thead>
+      <tbody id="rec-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     CALCULATOR PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-calc">
+  <div class="page-title" style="margin-bottom:18px"><i class="ti ti-calculator"></i> الحاسبة المالية</div>
+
+  <div class="grid2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-calendar-repeat" style="color:var(--teal)"></i> حاسبة الأقساط</div>
+      <div class="form-grid" style="grid-template-columns:1fr">
+        <div class="fg"><label>السعر الكلي (ج)</label><input type="number" id="c-price" placeholder="0" oninput="calcInst()"></div>
+        <div class="fg"><label>المقدم (ج)</label><input type="number" id="c-down" placeholder="0" oninput="calcInst()"></div>
+        <div class="fg">
+          <label>الفايدة: <span id="c-rate-val" style="color:var(--amber);font-weight:800">30%</span></label>
+          <input type="range" id="c-rate" min="0" max="50" value="30" oninput="calcInst();document.getElementById('c-rate-val').textContent=this.value+'%'">
+        </div>
+        <div class="fg">
+          <label>الأشهر: <span id="c-months-val" style="color:var(--blue);font-weight:800">10 شهر</span></label>
+          <input type="range" id="c-months" min="1" max="36" value="10" oninput="calcInst();document.getElementById('c-months-val').textContent=this.value+' شهر'">
+        </div>
+        <div id="calc-inst-result"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-percentage" style="color:var(--amber)"></i> مقارنة نسب الفايدة</div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr">
+        <div class="fg"><label>المبلغ (ج)</label><input type="number" id="c-cmp-amt" placeholder="0" oninput="calcCompare()"></div>
+        <div class="fg"><label>الأشهر</label><input type="number" id="c-cmp-months" placeholder="10" value="10" oninput="calcCompare()"></div>
+      </div>
+      <div id="calc-cmp-result" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-scale" style="color:var(--red)"></i> ملخص الالتزامات الشهرية</div>
+    <div id="calc-obligations"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><i class="ti ti-printer" style="color:var(--green)"></i> طباعة إيصال</div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="fg" style="flex:1"><label>اختر العميل</label>
+        <select id="receipt-client" onchange="receiptPreview()"></select>
+      </div>
+      <div class="fg"><label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="printReceiptFromSelect()">
+          <i class="ti ti-printer"></i> طباعة
+        </button>
+      </div>
+    </div>
+    <div id="receipt-preview"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════════════ -->
+
+<!-- Add/Edit Aqsat -->
+<div class="overlay" id="modal-aq">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-user-plus" style="color:var(--teal)"></i> بيانات العميل</div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr">
+      <div class="fg" style="grid-column:1/-1;position:relative"><label>الاسم</label><input id="aq-name" placeholder="اسم العميل" autocomplete="off" oninput="autocomplete('aq-name','aq-name-sug')" onkeydown="acKeydown(event,'aq-name-sug')"><div id="aq-name-sug" class="ac-dropdown"></div></div>
+      <div class="fg"><label>التليفون</label><input id="aq-phone" placeholder="01xxxxxxxxx" inputmode="tel"></div>
+      <div class="fg"><label>السلعة</label><input id="aq-item" placeholder="iPhone 15 Pro مثلاً"></div>
+      <div class="fg"><label>السعر (ج)</label><input type="number" id="aq-price" placeholder="0"></div>
+      <div class="fg"><label>المقدم (ج)</label><input type="number" id="aq-down" placeholder="0"></div>
+      <div class="fg"><label>الفايدة %</label><input type="number" id="aq-rate" value="30" placeholder="30"></div>
+      <div class="fg"><label>عدد الأشهر</label><input type="number" id="aq-months" value="10" placeholder="10"></div>
+      <div class="fg"><label>تاريخ الشراء</label><input type="date" id="aq-start"></div>
+      <div class="fg" style="grid-column:1/-1"><label>ملاحظة</label><input id="aq-note" placeholder="اختياري"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveAq()"><i class="ti ti-check"></i> حفظ</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-aq')"><i class="ti ti-x"></i> إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Qorod - Collect Payment Modal -->
+<div class="overlay" id="modal-pay-qr">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title"><i class="ti ti-arrow-down-circle" style="color:var(--green)"></i> تحصيل دفعة</div>
+    <input type="hidden" id="pay-qr-id">
+
+    <!-- Summary card -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-weight:900;font-size:15px;margin-bottom:8px" id="pay-qr-name-lbl"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text3)">
+        <span>الأصلي: <b id="pay-qr-orig-lbl" style="color:var(--blue)"></b></span>
+        <span>المتراكم: <b id="pay-qr-accum-lbl" style="color:var(--amber)"></b></span>
+        <span>إجمالي مستحق: <b id="pay-qr-due-lbl" style="color:var(--red)"></b></span>
+      </div>
+      <div class="pay-progress" style="margin-top:8px;margin-bottom:0">
+        <div class="pay-progress-bar" id="pay-qr-pbar" style="width:0%;background:var(--green)"></div>
+      </div>
+    </div>
+
+    <!-- Quick buttons -->
+    <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px">دفع سريع:</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="pay-qr-quick"></div>
+
+    <!-- Amount -->
+    <div class="fg" style="margin-bottom:12px">
+      <label>المبلغ المحصل (ج)</label>
+      <input type="number" id="pay-qr-amt" placeholder="0" inputmode="numeric"
+             style="font-size:18px;font-weight:900;text-align:center"
+             oninput="qrPayPreview()">
+    </div>
+    <div id="pay-qr-preview" style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:12px;min-height:16px"></div>
+
+    <!-- Type -->
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="qr-pay-type-btn active" id="qrpt-interest" onclick="qrSetPayType('interest')">💰 فايدة فقط</button>
+      <button class="qr-pay-type-btn" id="qrpt-principal" onclick="qrSetPayType('principal')">🏦 من الأصل</button>
+      <button class="qr-pay-type-btn" id="qrpt-both" onclick="qrSetPayType('both')">✅ فايدة + أصل</button>
+    </div>
+
+    <!-- Source -->
+    <div class="fg" style="margin-bottom:12px">
+      <label>طريقة الاستلام</label>
+      <select id="pay-qr-src">
+        <option value="cash">💵 كاش</option>
+        <option value="insta">📱 إنستا باي</option>
+        <option value="voda">📡 فودافون كاش</option>
+      </select>
+    </div>
+
+    <!-- Date + Note -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="fg">
+        <label>تاريخ التحصيل</label>
+        <input type="date" id="pay-qr-date">
+      </div>
+      <div class="fg">
+        <label>ملاحظة (اختياري)</label>
+        <input id="pay-qr-note" placeholder="...">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-green" style="flex:1;padding:13px;font-weight:900" onclick="savePayQr()">
+        <i class="ti ti-check"></i> تأكيد التحصيل
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-pay-qr')">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Qorod - Detail / History Modal -->
+<div class="overlay" id="modal-qr-detail">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-title"><i class="ti ti-history" style="color:var(--teal)"></i> سجل القرض</div>
+    <div id="qr-detail-body"></div>
+    <div style="margin-top:16px">
+      <button class="btn btn-ghost" style="width:100%" onclick="closeModal('modal-qr-detail')">
+        <i class="ti ti-x"></i> إغلاق
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Qorod - WhatsApp Modal -->
+<div class="overlay" id="modal-qr-wa">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title"><i class="ti ti-brand-whatsapp" style="color:#25D366"></i> تذكير واتساب</div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:14px">
+      <i class="ti ti-user-circle" style="font-size:24px;color:var(--green)"></i>
+      <div>
+        <div style="font-weight:800;font-size:14px" id="qr-wa-name"></div>
+        <div style="font-size:12px;color:var(--text3)" id="qr-wa-phone"></div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:700">نص الرسالة:</div>
+    <textarea id="qr-wa-text" style="width:100%;min-height:140px;resize:vertical;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:var(--rsm);padding:10px;font-family:'Cairo',sans-serif;font-size:13px;line-height:1.8;direction:rtl" oninput="document.getElementById('qr-wa-chars').textContent=this.value.length+' حرف'"></textarea>
+    <div style="font-size:11px;color:var(--text3);text-align:left;margin-top:4px;margin-bottom:14px" id="qr-wa-chars">0 حرف</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" style="flex:1;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-weight:800;padding:12px" onclick="qrWaSend()">
+        <i class="ti ti-brand-whatsapp"></i> إرسال
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-qr-wa')"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Pay Doyon -->
+<div class="overlay" id="modal-pay-dy">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModal('modal-pay-dy')"><i class="ti ti-x"></i></button>
+      <div class="modal-title"><i class="ti ti-arrow-down-circle" style="color:var(--amber)"></i> دفع دين</div>
+    </div>
+    <input type="hidden" id="pay-dy-id">
+
+    <!-- Summary -->
+    <div id="pay-dy-label" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px"></div>
+
+    <!-- نوع الدفع -->
+    <div class="fg" style="margin-bottom:14px">
+      <label style="font-weight:800;font-size:13px">نوع الدفع</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+        <button id="dy-type-interest" onclick="dySetPayType('interest')"
+          style="padding:10px;border-radius:10px;border:2px solid var(--aborder);background:var(--abg);
+                 color:var(--amber);font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;
+                 font-size:12px;transition:all .15s">
+          <i class="ti ti-coins" style="display:block;font-size:18px;margin-bottom:4px"></i>
+          دفع فايدة
+        </button>
+        <button id="dy-type-principal" onclick="dySetPayType('principal')"
+          style="padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--bg3);
+                 color:var(--text3);font-weight:800;cursor:pointer;font-family:'Cairo',sans-serif;
+                 font-size:12px;transition:all .15s">
+          <i class="ti ti-wallet" style="display:block;font-size:18px;margin-bottom:4px"></i>
+          سداد من الأصل
+        </button>
+      </div>
+    </div>
+
+    <!-- نص توضيحي -->
+    <div id="dy-pay-hint" style="font-size:11px;color:var(--amber);background:var(--abg);
+         border:1px solid var(--aborder);border-radius:8px;padding:8px 12px;margin-bottom:14px;
+         display:flex;align-items:center;gap:6px">
+      <i class="ti ti-info-circle"></i>
+      <span id="dy-pay-hint-text">دفع الفايدة المستحقة فقط — الأصل مش بيتغير</span>
+    </div>
+
+    <!-- المبلغ + التاريخ -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div class="fg" style="margin:0">
+        <label>المبلغ <span style="color:var(--red)">*</span></label>
+        <input type="number" id="pay-dy-amt" placeholder="0" inputmode="numeric"
+               style="font-size:20px;font-weight:900;text-align:center"
+               onkeydown="if(event.key==='Enter') savePayDy()">
+      </div>
+      <div class="fg" style="margin:0">
+        <label>التاريخ</label>
+        <input type="date" id="pay-dy-date-f">
+      </div>
+    </div>
+
+    <!-- طريقة الدفع -->
+    <div class="fg" style="margin-bottom:12px">
+      <label>طريقة الدفع</label>
+      <div style="display:flex;gap:8px">
+        <button class="dy-src-btn active" id="dysrc-cash"  onclick="dySetSrc('cash')">💵 كاش</button>
+        <button class="dy-src-btn"        id="dysrc-insta" onclick="dySetSrc('insta')">📱 إنستا</button>
+        <button class="dy-src-btn"        id="dysrc-voda"  onclick="dySetSrc('voda')">📡 فودافون</button>
+      </div>
+    </div>
+
+    <!-- ملاحظة -->
+    <div class="fg" style="margin-bottom:14px">
+      <label>ملاحظة (اختياري)</label>
+      <input id="pay-dy-note-f" placeholder="...">
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;padding:13px;font-size:15px;font-weight:900" onclick="savePayDy()">
+      <i class="ti ti-check"></i> تأكيد الدفع
+    </button>
+  </div>
+</div>
+
+<!-- Edit Balances -->
+<div class="overlay" id="modal-balances">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-wallet" style="color:var(--green)"></i> تعديل الأرصدة السابقة</div>
+    <div class="form-grid" style="grid-template-columns:1fr">
+      <div class="fg"><label>💵 كاش (ج)</label><input type="number" id="bal-cash" placeholder="0"></div>
+      <div class="fg"><label>📱 إنستا (ج)</label><input type="number" id="bal-insta" placeholder="0"></div>
+      <div class="fg"><label>📡 فودافون (ج)</label><input type="number" id="bal-voda" placeholder="0"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveBalances()"><i class="ti ti-check"></i> حفظ</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-balances')"><i class="ti ti-x"></i> إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change PIN Modal -->
+<div class="overlay" id="modal-change-pin">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-key" style="color:var(--amber)"></i> تغيير الباسورد</div>
+    <div class="form-grid" style="grid-template-columns:1fr">
+      <div class="fg">
+        <label>الباسورد الحالي</label>
+        <input type="password" id="pin-old" maxlength="4" inputmode="numeric" placeholder="● ● ● ●">
+      </div>
+      <div class="fg">
+        <label>الباسورد الجديد (4 أرقام)</label>
+        <input type="password" id="pin-new" maxlength="4" inputmode="numeric" placeholder="● ● ● ●">
+      </div>
+      <div class="fg">
+        <label>تأكيد الباسورد الجديد</label>
+        <input type="password" id="pin-confirm" maxlength="4" inputmode="numeric" placeholder="● ● ● ●">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" style="flex:1" onclick="savePinChange()"><i class="ti ti-check"></i> حفظ</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-change-pin');clearPinFields()"><i class="ti ti-x"></i> إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+
+<!-- Backup Reminder Banner -->
+<div id="backup-banner">
+  <div class="backup-pulse"></div>
+  <div style="flex:1;min-width:200px">
+    <div style="font-size:13px;font-weight:800;color:var(--amber);margin-bottom:3px">
+      <i class="ti ti-alert-triangle" style="margin-left:6px"></i>تذكير: عمل نسخة احتياطية
+    </div>
+    <div style="font-size:11px;color:var(--text3)" id="backup-banner-sub"></div>
+  </div>
+  <button class="btn btn-primary btn-sm" onclick="exportDataNow()">
+    <i class="ti ti-download"></i> نسخ الآن
+  </button>
+  <button class="btn btn-ghost btn-sm" onclick="snoozeBackup()">
+    <i class="ti ti-clock"></i> لاحقاً
+  </button>
+  <button onclick="document.getElementById('backup-banner').classList.remove('show')"
+    style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;padding:4px">
+    <i class="ti ti-x"></i>
+  </button>
+</div>
+
+<!-- Backup Status Modal -->
+<div class="overlay" id="modal-backup">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-title"><i class="ti ti-database" style="color:var(--teal)"></i> النسخ الاحتياطي</div>
+
+    <!-- Status card -->
+    <div id="backup-status-card" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:16px"></div>
+
+    <!-- خطر warning لو مفيش نسخة -->
+    <div id="backup-danger-warn" style="display:none;background:var(--rbg);border:1.5px solid var(--rborder);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <i class="ti ti-shield-off" style="color:var(--red);font-size:24px;flex-shrink:0"></i>
+        <div>
+          <div style="font-weight:900;color:var(--red);font-size:13px">⚠️ بياناتك بدون حماية!</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">لو المتصفح اتمسح أو الجهاز اتكسر — كل البيانات هتروح. اعمل نسخة دلوقتي.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ☁️ Google Sheets Sync -->
+    <div style="background:var(--bg3);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:36px;height:36px;border-radius:10px;background:#0F9D5822;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px">🟢</div>
+        <div style="flex:1">
+          <div style="font-weight:900;font-size:13px">مزامنة Google Sheets</div>
+          <div style="font-size:11px;color:var(--text3)" id="sheets-sync-status">غير مفعّل</div>
+        </div>
+        <div id="sheets-sync-dot" style="width:10px;height:10px;border-radius:50%;background:var(--text3);flex-shrink:0"></div>
+      </div>
+
+      <!-- URL input -->
+      <div id="sheets-url-section">
+        <div class="fg" style="margin-bottom:10px">
+          <label style="font-size:11px">رابط الـ Web App (من Google Apps Script)</label>
+          <input id="sheets-url-input" type="url" placeholder="https://script.google.com/macros/s/..." style="font-size:12px"
+                 oninput="validateSheetsUrl(this.value)">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" style="flex:1;background:#0F9D5822;color:#0F9D58;border:1px solid #0F9D5844" onclick="testSheetsConnection()">
+            <i class="ti ti-plug"></i> اختبار الاتصال
+          </button>
+          <button class="btn btn-sm" style="flex:1;background:var(--bbg);color:var(--blue);border:1px solid var(--bborder)" onclick="saveSheetsUrl()">
+            <i class="ti ti-check"></i> حفظ الرابط
+          </button>
+        </div>
+      </div>
+
+      <!-- Sync buttons (show after URL saved) -->
+      <div id="sheets-actions" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="btn btn-sm" style="flex:1;background:#0F9D5822;color:#0F9D58;border:1px solid #0F9D5844" onclick="syncToSheets()">
+            <i class="ti ti-cloud-upload"></i> رفع للـ Sheets
+          </button>
+          <button class="btn btn-sm" style="flex:1;background:var(--bbg);color:var(--blue);border:1px solid var(--bborder)" onclick="syncFromSheets()">
+            <i class="ti ti-cloud-download"></i> تنزيل من Sheets
+          </button>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;font-size:11px;color:var(--text3)" id="sheets-last-sync"></div>
+          <button class="btn btn-sm btn-ghost" style="font-size:11px;padding:4px 8px" onclick="clearSheetsUrl()">
+            <i class="ti ti-unlink"></i> فصل
+          </button>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;font-size:12px">
+          <input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSync(this.checked)" style="width:16px;height:16px;accent-color:var(--accent)">
+          مزامنة تلقائية عند كل تغيير
+        </label>
+      </div>
+    </div>
+
+    <!-- أزرار الحفظ المحلي -->
+    <div style="font-size:12px;font-weight:800;color:var(--text3);margin-bottom:10px">📥 نسخة محلية:</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <button class="btn btn-primary" onclick="exportDataNow()" style="padding:12px">
+        <i class="ti ti-download"></i> تنزيل JSON
+        <div style="font-size:10px;opacity:.8;font-weight:400;margin-top:2px">ملف على جهازك</div>
+      </button>
+      <button class="btn" style="background:var(--gbg);color:var(--green);border:1.5px solid var(--gborder);padding:12px" onclick="backupToLocalHistory()">
+        <i class="ti ti-device-floppy"></i> حفظ محلي سريع
+        <div style="font-size:10px;opacity:.8;font-weight:400;margin-top:2px">في المتصفح (آخر 5)</div>
+      </button>
+      <button class="btn btn-ghost" onclick="copyBackupToClipboard()" style="padding:12px">
+        <i class="ti ti-copy"></i> نسخ للكليبورد
+        <div style="font-size:10px;opacity:.7;font-weight:400;margin-top:2px">للصق في نص أو إيميل</div>
+      </button>
+      <button class="btn btn-ghost" onclick="shareBackupWA()" style="padding:12px;color:#25D366;border-color:#25D36644">
+        <i class="ti ti-brand-whatsapp"></i> إرسال واتساب
+        <div style="font-size:10px;opacity:.8;font-weight:400;margin-top:2px">بعت النسخة لنفسك</div>
+      </button>
+    </div>
+
+    <!-- النسخ المحفوظة محلياً -->
+    <div style="font-size:12px;font-weight:800;color:var(--text3);margin-bottom:8px">🗄️ النسخ المحفوظة محلياً (آخر 5):</div>
+    <div id="local-backup-list" style="margin-bottom:16px"></div>
+
+    <!-- استيراد -->
+    <div style="font-size:12px;font-weight:800;color:var(--text3);margin-bottom:10px">📤 استيراد نسخة:</div>
+    <div id="import-preview" style="display:none;background:var(--gbg);border:1.5px solid var(--gborder);border-radius:10px;padding:12px;margin-bottom:12px"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+      <label class="btn btn-ghost" style="cursor:pointer;flex:1;justify-content:center;padding:11px">
+        <i class="ti ti-upload"></i> استيراد من ملف
+        <input type="file" accept=".json" onchange="previewImport(this)" style="display:none">
+      </label>
+      <button class="btn btn-ghost" onclick="importFromClipboard()" style="flex:1;padding:11px">
+        <i class="ti ti-clipboard"></i> استيراد من الكليبورد
+      </button>
+    </div>
+
+    <!-- إعدادات التذكير -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:800">🔔 تذكير تلقائي</div>
+        <select id="backup-interval-sel" onchange="saveBackupSettings()" style="width:auto;font-size:12px">
+          <option value="1">كل يوم</option>
+          <option value="3">كل 3 أيام</option>
+          <option value="7" selected>كل أسبوع</option>
+          <option value="14">كل أسبوعين</option>
+          <option value="30">كل شهر</option>
+          <option value="0">إيقاف</option>
+        </select>
+      </div>
+      <div style="font-size:11px;color:var(--text3)">هيظهرلك banner في الأعلى لما يحين وقت النسخة</div>
+    </div>
+
+    <button class="btn btn-ghost" style="width:100%" onclick="closeModal('modal-backup')">
+      <i class="ti ti-x"></i> إغلاق
+    </button>
+  </div>
+</div>
+
+<!-- Edit Bore -->
+<div class="overlay" id="modal-edit-bore">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title"><i class="ti ti-edit" style="color:var(--blue)"></i> تعديل مبلغ بند</div>
+    <input type="hidden" id="edit-br-id">
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:2px">البند</div>
+        <div style="font-weight:900;font-size:15px" id="edit-br-name"></div>
+      </div>
+      <div style="text-align:left">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:2px">الحالي</div>
+        <div style="font-weight:900;color:var(--blue);font-size:16px" id="edit-br-cur"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div class="fg" style="margin:0">
+        <label>المبلغ الجديد (ج)</label>
+        <input type="number" id="edit-br-amt" placeholder="0" inputmode="numeric"
+               style="font-size:18px;font-weight:900;text-align:center">
+      </div>
+      <div class="fg" style="margin:0">
+        <label>تاريخ التعديل</label>
+        <input type="date" id="edit-br-date">
+      </div>
+    </div>
+
+    <div class="fg" style="margin-bottom:16px">
+      <label>سبب التعديل (اختياري)</label>
+      <input id="edit-br-note-e" placeholder="مثال: تم السداد جزئي، تعديل مبلغ...">
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn" style="flex:1;padding:13px;font-weight:900;background:var(--bbg);color:var(--blue);border:1.5px solid var(--bborder)" onclick="saveEditBore()">
+        <i class="ti ti-check"></i> حفظ التعديل
+      </button>
+      <button class="btn btn-ghost" style="padding:13px 16px" onclick="closeModal('modal-edit-bore')">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Qorod -->
+<div class="overlay" id="modal-edit-qr">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-edit" style="color:var(--red)"></i> تعديل قرض</div>
+    <input type="hidden" id="edit-qr-id">
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fg" style="grid-column:1/-1"><label>الاسم</label><input id="edit-qr-name" placeholder="صاحب القرض"></div>
+      <div class="fg"><label>المبلغ الأصلي (ج)</label><input type="number" id="edit-qr-orig" placeholder="0"></div>
+      <div class="fg"><label>المتبقي (ج)</label><input type="number" id="edit-qr-remaining" placeholder="0"></div>
+      <div class="fg"><label>الفايدة الشهرية (ج)</label><input type="number" id="edit-qr-monthly" placeholder="0"></div>
+      <div class="fg"><label>الحالة</label>
+        <select id="edit-qr-status">
+          <option value="active">نشط</option>
+          <option value="done">منتهي</option>
+        </select>
+      </div>
+      <div class="fg" style="grid-column:1/-1"><label>ملاحظة</label><input id="edit-qr-note" placeholder="اختياري"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveEditQr()"><i class="ti ti-check"></i> حفظ</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-qr')"><i class="ti ti-x"></i> إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Qr Payment -->
+<div class="overlay" id="modal-edit-qr-payment">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title"><i class="ti ti-edit" style="color:var(--blue)"></i> تعديل دفعة قرض</div>
+    <input type="hidden" id="eqrp-qid">
+    <input type="hidden" id="eqrp-idx">
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fg">
+        <label>المبلغ (ج)</label>
+        <input type="number" id="eqrp-amt" placeholder="0" inputmode="numeric" style="font-size:18px;font-weight:900;text-align:center">
+      </div>
+      <div class="fg">
+        <label>التاريخ</label>
+        <input type="date" id="eqrp-date">
+      </div>
+      <div class="fg" style="grid-column:1/-1">
+        <label>النوع</label>
+        <select id="eqrp-type">
+          <option value="interest">فايدة</option>
+          <option value="principal">أصل</option>
+          <option value="both">فايدة + أصل</option>
+        </select>
+      </div>
+      <div class="fg" style="grid-column:1/-1">
+        <label>طريقة الدفع</label>
+        <select id="eqrp-src">
+          <option value="cash">💵 كاش</option>
+          <option value="insta">📱 إنستا</option>
+          <option value="voda">📡 فودافون</option>
+        </select>
+      </div>
+      <div class="fg" style="grid-column:1/-1">
+        <label>ملاحظة (اختياري)</label>
+        <input id="eqrp-note" placeholder="...">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveEditQrPayment()"><i class="ti ti-check"></i> حفظ التعديل</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-qr-payment')"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+</div>
+<!-- Edit Doyon -->
+<div class="overlay" id="modal-edit-dy">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-edit" style="color:var(--amber)"></i> تعديل دين</div>
+    <input type="hidden" id="edit-dy-id">
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fg" style="grid-column:1/-1"><label>الاسم</label><input id="edit-dy-name" placeholder="الدائن"></div>
+      <div class="fg"><label>المبلغ الأصلي (ج)</label><input type="number" id="edit-dy-orig" placeholder="0"></div>
+      <div class="fg"><label>المتبقي (ج)</label><input type="number" id="edit-dy-remaining" placeholder="0"></div>
+      <div class="fg"><label>الفايدة الشهرية (ج)</label><input type="number" id="edit-dy-monthly" placeholder="0"></div>
+      <div class="fg"><label>الحالة</label>
+        <select id="edit-dy-status">
+          <option value="active">نشط</option>
+          <option value="done">منتهي</option>
+        </select>
+      </div>
+      <div class="fg" style="grid-column:1/-1"><label>ملاحظة</label><input id="edit-dy-note" placeholder="اختياري"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveEditDy()"><i class="ti ti-check"></i> حفظ</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-dy')"><i class="ti ti-x"></i> إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Daily Entry -->
+<div class="overlay" id="modal-edit-entry">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-edit" style="color:var(--blue)"></i> تعديل الحركة</div>
+    <input type="hidden" id="edit-entry-id">
+    <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fg" style="grid-column:1/-1">
+        <label>البيان</label>
+        <input id="edit-entry-name" placeholder="اسم الحركة">
+      </div>
+      <div class="fg">
+        <label>المبلغ (ج)</label>
+        <input type="number" id="edit-entry-amt" placeholder="0">
+      </div>
+      <div class="fg">
+        <label>المصدر</label>
+        <select id="edit-entry-src">
+          <option value="cash">💵 كاش</option>
+          <option value="insta">📱 إنستا</option>
+          <option value="voda">📡 فودافون</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>النوع</label>
+        <select id="edit-entry-type">
+          <option value="in">⬇️ وارد</option>
+          <option value="out">⬆️ صادر</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>التاريخ</label>
+        <input type="date" id="edit-entry-date">
+      </div>
+      <div class="fg" style="grid-column:1/-1">
+        <label>ملاحظة</label>
+        <input id="edit-entry-note" placeholder="اختياري">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveEditEntry()">
+        <i class="ti ti-check"></i> حفظ التعديل
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-entry')">
+        <i class="ti ti-x"></i> إلغاء
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Late Clients Notification -->
+<div id="notif-overlay">
+  <div class="notif-box">
+    <div class="notif-header">
+      <div class="notif-icon"><i class="ti ti-bell-ringing"></i></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:17px;font-weight:900;margin-bottom:4px">تنبيه المتأخرين</div>
+        <div style="font-size:12px;color:var(--text3)" id="notif-summary"></div>
+      </div>
+      <button onclick="closeNotif()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;padding:4px;flex-shrink:0"><i class="ti ti-x"></i></button>
+    </div>
+    <!-- Stats bar -->
+    <div id="notif-stats" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"></div>
+    <div class="notif-list" id="notif-list"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" style="flex:1" onclick="closeNotif();nav('pg-today')">
+        <i class="ti ti-sun"></i> عرض اليوم
+      </button>
+      <button class="btn btn-ghost" style="flex:1" onclick="notifWaSendAll()">
+        <i class="ti ti-brand-whatsapp" style="color:#25D366"></i> واتساب الكل
+      </button>
+      <button class="btn btn-ghost" onclick="closeNotif()">
+        <i class="ti ti-x"></i> إغلاق
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-icon"><i class="ti ti-alert-triangle"></i></div>
+    <div class="confirm-title" id="confirm-title"></div>
+    <div class="confirm-msg" id="confirm-msg"></div>
+    <div class="confirm-btns">
+      <button class="btn btn-red" id="confirm-yes"><i class="ti ti-check"></i> تأكيد</button>
+      <button class="btn btn-ghost" id="confirm-no"><i class="ti ti-x"></i> إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast">
+  <i id="toast-ico" class="ti ti-circle-check"></i>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  🏪 نظام المحل PRO &nbsp;·&nbsp;
+  <span id="footer-date"></span>
+  <script>document.getElementById('footer-date').textContent=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});</script>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SETTINGS PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-settings">
+  <div class="page-header">
+    <div class="page-title"><i class="ti ti-settings"></i> الإعدادات</div>
+  </div>
+
+  <!-- Shop Info -->
+  <div class="settings-section">
+    <div class="settings-section-title"><i class="ti ti-store" style="color:var(--accent)"></i> بيانات المحل</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">اسم المحل</div>
+        <div class="settings-row-sub">بيظهر في الإيصالات والتقارير</div>
+      </div>
+      <input id="set-shop-name" placeholder="نظام المحل" style="width:200px;text-align:right">
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">العملة</div>
+        <div class="settings-row-sub">الرمز اللي بيظهر جنب الأرقام</div>
+      </div>
+      <select id="set-currency" style="width:120px">
+        <option value="ج">ج (جنيه)</option>
+        <option value="ر.س">ر.س (ريال)</option>
+        <option value="د.إ">د.إ (درهم)</option>
+        <option value="$">$ (دولار)</option>
+        <option value="€">€ (يورو)</option>
+      </select>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">رقم التليفون</div>
+        <div class="settings-row-sub">بيظهر في الإيصالات</div>
+      </div>
+      <input id="set-phone" placeholder="01xxxxxxxxx" style="width:200px;text-align:right" inputmode="tel">
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn btn-primary btn-sm" onclick="saveShopSettings()">
+        <i class="ti ti-check"></i> حفظ البيانات
+      </button>
+    </div>
+  </div>
+
+  <!-- Security -->
+  <div class="settings-section">
+    <div class="settings-section-title"><i class="ti ti-shield-lock" style="color:var(--amber)"></i> الأمان</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">تغيير الباسورد</div>
+        <div class="settings-row-sub">الباسورد 4 أرقام</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="changePin()">
+        <i class="ti ti-key"></i> تغيير PIN
+      </button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">قفل الشاشة</div>
+        <div class="settings-row-sub">قفل البرنامج الآن (اختصار: L)</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="lockNow()">
+        <i class="ti ti-lock"></i> قفل الآن
+      </button>
+    </div>
+  </div>
+
+  <!-- Appearance -->
+  <div class="settings-section">
+    <div class="settings-section-title"><i class="ti ti-palette" style="color:var(--purple)"></i> المظهر</div>
+
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">وضع العرض</div>
+        <div class="settings-row-sub">فاتح أو داكن</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="set-theme-btn-s">
+        <i class="ti ti-sun" id="set-theme-icon-s"></i> <span id="set-theme-label">نهاري</span>
+      </button>
+    </div>
+
+    <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:14px">
+      <div>
+        <div class="settings-row-label">لون الثيم</div>
+        <div class="settings-row-sub">اختار اللون الرئيسي في التطبيق</div>
+      </div>
+      <div id="color-swatches" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <label style="font-size:12px;color:var(--text3);font-weight:700">لون مخصص:</label>
+        <input type="color" id="custom-color-picker" style="width:40px;height:32px;border:none;border-radius:8px;cursor:pointer;background:none" oninput="applyAccentColor(this.value)">
+        <button class="btn btn-ghost btn-sm" onclick="resetAccentColor()"><i class="ti ti-refresh"></i> افتراضي</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Backup -->
+  <div class="settings-section">
+    <div class="settings-section-title"><i class="ti ti-database" style="color:var(--teal)"></i> النسخ الاحتياطي</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">إدارة النسخ الاحتياطية</div>
+        <div class="settings-row-sub" id="set-backup-sub">جاري التحميل...</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openBackupModal()">
+        <i class="ti ti-database"></i> إدارة النسخ
+      </button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">تنزيل نسخة احتياطية الآن</div>
+        <div class="settings-row-sub">ملف JSON فيه كل البيانات</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="exportDataNow()">
+        <i class="ti ti-download"></i> تنزيل
+      </button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">استيراد نسخة احتياطية</div>
+        <div class="settings-row-sub">رجوع من ملف JSON محفوظ</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="document.querySelector('input[type=file]').click()">
+        <i class="ti ti-upload"></i> استيراد
+      </button>
+    </div>
+  </div>
+
+  <!-- Data -->
+  <div class="settings-section">
+    <div class="settings-section-title"><i class="ti ti-database-off" style="color:var(--red)"></i> البيانات</div>
+    <div id="set-data-stats" style="margin-bottom:14px"></div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label" style="color:var(--red)">مسح كل البيانات</div>
+        <div class="settings-row-sub">حذف كل حاجة — مفيش رجوع!</div>
+      </div>
+      <button class="btn btn-sm" style="background:var(--rbg);color:var(--red);border:1px solid var(--rborder)" onclick="resetData()">
+        <i class="ti ti-trash"></i> مسح الكل
+      </button>
+    </div>
+  </div>
+
+  <!-- Firebase Status -->
+  <div class="settings-section">
+    <div class="settings-section-title"><i class="ti ti-cloud" style="color:var(--teal)"></i> Firebase — المزامنة السحابية</div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">حالة الاتصال</div>
+        <div class="settings-row-sub">البيانات بتتحفظ تلقائياً على السحابة</div>
+      </div>
+      <div id="fb-status-settings" style="display:flex;align-items:center;gap:6px">
+        <i class="ti ti-loader" style="color:var(--text3)"></i>
+        <span style="font-size:12px;color:var(--text3)">جاري التحقق...</span>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label">مزامنة يدوية</div>
+        <div class="settings-row-sub">اجبر حفظ البيانات على السحابة الآن</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="forceFbSync()">
+        <i class="ti ti-cloud-upload"></i> مزامنة الآن
+      </button>
+    </div>
+  </div>
+
+  <!-- About -->
+  <div class="settings-section">
+    <div class="settings-section-title"><i class="ti ti-info-circle" style="color:var(--blue)"></i> عن البرنامج</div>
+    <div class="settings-row">
+      <div class="settings-row-label">الإصدار</div>
+      <span style="font-size:12px;color:var(--text3)">نظام المحل PRO v6.0</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-label">حجم البيانات المحفوظة</div>
+      <span id="set-storage-size" style="font-size:12px;color:var(--teal);font-weight:800"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     CLIENT DETAIL PAGE
+═══════════════════════════════════════════════════════════ -->
+<div class="page" id="pg-aq-detail">
+  <!-- Rendered dynamically by renderClientDetail() -->
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     GLOBAL SEARCH OVERLAY
+═══════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════════════
+     CLIENT PROFILE MODAL — ملف العميل الكامل
+═══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="modal-client-profile" style="z-index:900">
+  <div class="modal" style="max-width:560px;padding:0;overflow:hidden">
+    <div id="cp-header" style="padding:20px 20px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2))">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div id="cp-avatar" style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0"></div>
+        <div style="flex:1">
+          <div id="cp-name" style="font-size:18px;font-weight:900;color:#fff"></div>
+          <div id="cp-phone" style="font-size:12px;color:rgba(255,255,255,.7);margin-top:2px"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-client-profile')" style="color:rgba(255,255,255,.7)"><i class="ti ti-x"></i></button>
+      </div>
+      <div id="cp-chips" style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"></div>
+    </div>
+    <div id="cp-tabs" style="display:flex;background:var(--bg2);border-bottom:1px solid var(--border)"></div>
+    <div id="cp-content" style="padding:16px;max-height:55vh;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     QUICK PAYMENT MODAL — دفعة قسط سريعة
+═══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="modal-quick-payment">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModal('modal-quick-payment')"><i class="ti ti-x"></i></button>
+      <div class="modal-title"><i class="ti ti-credit-card" style="color:var(--accent)"></i> دفعة قسط سريعة</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;padding:4px 0">
+      <div class="fg" style="position:relative">
+        <label>اسم العميل</label>
+        <input id="qp-name" placeholder="ابدأ الكتابة..." autocomplete="off"
+          oninput="autocompleteAqsat('qp-name','qp-suggestions')"
+          onkeydown="acKeydown(event,'qp-suggestions')">
+        <div id="qp-suggestions" class="ac-dropdown"></div>
+      </div>
+      <div id="qp-client-info" style="display:none;background:var(--bg3);border-radius:10px;padding:12px;border:1px solid var(--border)"></div>
+      <div class="fg">
+        <label>المبلغ</label>
+        <input type="number" id="qp-amt" placeholder="0" inputmode="numeric"
+          onkeydown="if(event.key==='Enter') submitQuickPayment()">
+      </div>
+      <div class="fg">
+        <label>ملاحظة (اختياري)</label>
+        <input id="qp-note" placeholder="..."
+          onkeydown="if(event.key==='Enter') submitQuickPayment()">
+      </div>
+      <button class="btn btn-primary" onclick="submitQuickPayment()" style="width:100%;padding:13px;font-size:15px;font-weight:800">
+        <i class="ti ti-check"></i> تسجيل الدفعة
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="search-overlay" style="
+  position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(16px);
+  display:none;flex-direction:column;align-items:center;
+  padding-top:80px;
+">
+  <div style="width:100%;max-width:680px;padding:0 20px">
+    <!-- Search input -->
+    <div style="position:relative;margin-bottom:16px">
+      <i class="ti ti-search" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:20px;color:var(--text3)"></i>
+      <input id="global-search-input"
+        placeholder="ابحث عن عميل، مبلغ، بيان، تليفون..."
+        style="width:100%;padding:16px 50px 16px 50px;font-size:16px;border-radius:16px;
+               background:var(--bg2);border:2px solid var(--accent);
+               box-shadow:0 0 0 4px rgba(91,127,255,.15);letter-spacing:.3px"
+        oninput="globalSearch(this.value)">
+      <button onclick="closeSearch()" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);
+        background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;padding:4px">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <!-- Hint -->
+    <div id="search-hint" style="text-align:center;color:var(--text3);font-size:12px;margin-bottom:20px">
+      اكتب للبحث · <kbd style="background:var(--bg3);border:1px solid var(--border);padding:2px 7px;border-radius:4px;font-size:11px">Esc</kbd> للإغلاق
+    </div>
+    <!-- Results -->
+    <div id="search-results"
+      style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;
+             overflow:hidden;max-height:60vh;overflow-y:auto;box-shadow:var(--shl)">
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="module" src="js/firebase.js"></script>
+<script src="js/data.js"></script>
+<script src="js/render.js"></script>
+<script src="js/actions.js"></script>
+<script src="js/utils.js"></script>
+
+<!-- ── FAB Quick Add ──────────────────────────────────────── -->
+<div id="fab-backdrop" onclick="closeFab()"></div>
+
+<div id="fab-menu">
+  <div class="fab-item">
+    <span class="fab-item-label">دفعة قسط</span>
+    <button class="fab-item-btn" style="background:linear-gradient(135deg,var(--accent),var(--accent2))" onclick="closeFab();openQuickPayment()">
+      <i class="ti ti-credit-card"></i>
+    </button>
+  </div>
+  <div class="fab-item">
+    <span class="fab-item-label">عميل أقساط جديد</span>
+    <button class="fab-item-btn" style="background:linear-gradient(135deg,var(--teal),#0891B2)" onclick="closeFab();openAddAq()">
+      <i class="ti ti-user-plus"></i>
+    </button>
+  </div>
+  <div class="fab-item">
+    <span class="fab-item-label">صادر سريع</span>
+    <button class="fab-item-btn" style="background:linear-gradient(135deg,var(--red),#be123c)" onclick="openFabEntry('out')">
+      <i class="ti ti-arrow-up-circle"></i>
+    </button>
+  </div>
+  <div class="fab-item">
+    <span class="fab-item-label">وارد سريع</span>
+    <button class="fab-item-btn" style="background:linear-gradient(135deg,var(--green),#059669)" onclick="openFabEntry('in')">
+      <i class="ti ti-arrow-down-circle"></i>
+    </button>
+  </div>
+</div>
+
+<button id="fab" onclick="toggleFab()" title="إضافة سريعة">
+  <i class="ti ti-plus"></i>
+</button>
+
+<!-- FAB entry sheet -->
+<div id="modal-fab">
+  <div class="fab-sheet">
+    <div class="fab-sheet-title">
+      <i id="fab-entry-icon" class="ti ti-arrow-down-circle" style="color:var(--green)"></i>
+      <span id="fab-entry-title">وارد سريع</span>
+      <button onclick="document.getElementById('modal-fab').classList.remove('open')" style="margin-right:auto;background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px"><i class="ti ti-x"></i></button>
+    </div>
+    <input type="hidden" id="fab-entry-type" value="in">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="fg" style="position:relative"><label>البيان</label><input id="fab-name" placeholder="اسم الحركة" autofocus autocomplete="off" oninput="autocomplete('fab-name','fab-name-sug')" onkeydown="acKeydown(event,'fab-name-sug')"><div id="fab-name-sug" class="ac-dropdown"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label>المبلغ (ج)</label><input type="number" id="fab-amt" placeholder="0" inputmode="numeric"></div>
+        <div class="fg"><label>المصدر</label>
+          <select id="fab-src">
+            <option value="cash">💵 كاش</option>
+            <option value="insta">📱 إنستا</option>
+            <option value="voda">📡 فودافون</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>ملاحظة (اختياري)</label><input id="fab-note" placeholder="..."></div>
+      <button id="fab-submit-btn" class="btn btn-green" onclick="submitFabEntry()" style="width:100%;padding:14px;font-size:15px;font-weight:800">
+        <i class="ti ti-check"></i> حفظ
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- WhatsApp Message Modal -->
+<div class="overlay" id="modal-wa">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title"><i class="ti ti-brand-whatsapp" style="color:#25D366"></i> إرسال واتساب</div>
+
+    <!-- Client info -->
+    <div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:14px">
+      <i class="ti ti-user-circle" style="font-size:24px;color:var(--accent)"></i>
+      <div>
+        <div style="font-weight:800;font-size:14px" id="wa-modal-name"></div>
+        <div style="font-size:12px;color:var(--text3)" id="wa-modal-phone"></div>
+      </div>
+    </div>
+
+    <!-- Template buttons -->
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;font-weight:700">اختار نوع الرسالة:</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="wa-tpl-btn" id="wa-tpl-due"      onclick="waSwitchTemplate('due')">📅 تذكير قسط</button>
+      <button class="wa-tpl-btn" id="wa-tpl-late"     onclick="waSwitchTemplate('late')">⏰ متأخر</button>
+      <button class="wa-tpl-btn" id="wa-tpl-paid"     onclick="waSwitchTemplate('paid')">✅ تأكيد دفع</button>
+      <button class="wa-tpl-btn" id="wa-tpl-tomorrow" onclick="waSwitchTemplate('tomorrow')">🔔 تذكير قبل يوم</button>
+      <button class="wa-tpl-btn" id="wa-tpl-done"     onclick="waSwitchTemplate('done')">🎉 مبروك السداد</button>
+    </div>
+
+    <!-- Editable message -->
+    <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:700">نص الرسالة (قابل للتعديل):</div>
+    <textarea id="wa-msg-text" oninput="document.getElementById('wa-char-count').textContent = this.value.length + ' حرف'"></textarea>
+    <div class="wa-char-count" id="wa-char-count">0 حرف</div>
+
+    <!-- Action buttons -->
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn" style="flex:1;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-weight:800;padding:12px" onclick="waSendMsg()">
+        <i class="ti ti-brand-whatsapp"></i> إرسال
+      </button>
+      <button class="btn btn-ghost" style="flex:1" onclick="waSendWithReceipt()">
+        <i class="ti ti-printer"></i> إرسال + إيصال
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-wa')">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="overlay" id="modal-payment">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title"><i class="ti ti-cash" style="color:var(--green)"></i> تسديد قسط</div>
+
+    <!-- Client summary -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-weight:900;font-size:15px;margin-bottom:6px" id="pay-client-name"></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:8px">
+        <span>القسط الشهري: <b id="pay-inst" style="color:var(--teal)"></b></span>
+        <span>المتبقي: <b id="pay-rem" style="color:var(--red)"></b></span>
+        <span>المسدد: <b id="pay-progress-txt" style="color:var(--green)"></b></span>
+      </div>
+      <div class="pay-progress"><div class="pay-progress-bar" id="pay-progress-bar" style="width:0%"></div></div>
+    </div>
+
+    <!-- Quick amount buttons -->
+    <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px">اختار المبلغ:</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px" id="pay-quick-btns"></div>
+
+    <!-- Custom amount -->
+    <div class="fg" style="margin-bottom:12px">
+      <label>مبلغ مخصص (ج)</label>
+      <input type="number" id="pay-custom-amt" placeholder="0" inputmode="numeric"
+        oninput="onPayAmountInput(this.value)" style="font-size:18px;font-weight:900;text-align:center">
+    </div>
+
+    <!-- Source -->
+    <div class="fg" style="margin-bottom:16px">
+      <label>طريقة الدفع</label>
+      <select id="pay-source">
+        <option value="cash">💵 كاش</option>
+        <option value="insta">📱 إنستا باي</option>
+        <option value="voda">📡 فودافون كاش</option>
+      </select>
+    </div>
+
+    <!-- Date + Note -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div class="fg">
+        <label>تاريخ الدفع</label>
+        <input type="date" id="pay-date">
+      </div>
+      <div class="fg">
+        <label>ملاحظة (اختياري)</label>
+        <input id="pay-note" placeholder="مثلاً: دفع جزء من المتأخرات">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-green" style="flex:1;padding:13px;font-size:14px;font-weight:900" onclick="submitPayment()">
+        <i class="ti ti-check"></i> تأكيد السداد
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-payment')">
+        <i class="ti ti-x"></i> إلغاء
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Slot Payment Modal -->
+<div class="overlay" id="modal-slot-payment">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-title"><i class="ti ti-calendar-due" style="color:var(--teal)"></i> <span id="slot-title">تسديد شهر</span></div>
+
+    <!-- Slot summary -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:3px">القسط</div>
+          <div style="font-weight:900;color:var(--text)" id="slot-inst"></div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:3px">مدفوع</div>
+          <div style="font-weight:900;color:var(--green)" id="slot-paid"></div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:3px">المتبقي</div>
+          <div style="font-weight:900;color:var(--red)" id="slot-rem"></div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:3px">الحالة</div>
+          <div style="font-weight:800;font-size:12px" id="slot-status"></div>
+        </div>
+      </div>
+      <div class="pay-progress" style="margin-top:10px;margin-bottom:0">
+        <div class="pay-progress-bar" id="slot-pbar" style="width:0%;background:var(--teal)"></div>
+      </div>
+    </div>
+
+    <!-- سجل الدفعات مع زرار حذف لكل دفعة -->
+    <div id="slot-history-wrap" style="display:none;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:6px">
+        <i class="ti ti-history" style="margin-left:4px"></i>دفعات هذا الشهر:
+      </div>
+      <div id="slot-history" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden"></div>
+    </div>
+
+    <!-- Quick buttons -->
+    <div id="slot-pay-section">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px">دفع سريع:</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="slot-quick-btns"></div>
+
+      <!-- Amount + Date in grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="fg" style="margin:0">
+          <label>المبلغ (ج)</label>
+          <input type="number" id="slot-custom-amt" placeholder="0" inputmode="numeric"
+                 style="font-size:18px;font-weight:900;text-align:center">
+        </div>
+        <div class="fg" style="margin:0">
+          <label>تاريخ الدفع</label>
+          <input type="date" id="slot-pay-date">
+        </div>
+      </div>
+
+      <!-- Source -->
+      <div class="fg" style="margin-bottom:12px">
+        <label>طريقة الدفع</label>
+        <div style="display:flex;gap:6px">
+          <button class="slot-src-btn active" id="ssrc-cash"  onclick="slotSetSrc('cash')" >💵 كاش</button>
+          <button class="slot-src-btn"        id="ssrc-insta" onclick="slotSetSrc('insta')">📱 إنستا</button>
+          <button class="slot-src-btn"        id="ssrc-voda"  onclick="slotSetSrc('voda')" >📡 فودافون</button>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="fg" style="margin-bottom:14px">
+        <label>ملاحظة (اختياري)</label>
+        <input id="slot-note" placeholder="...">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" style="flex:1;padding:12px;font-weight:900;background:var(--tbg);color:var(--teal);border:1.5px solid var(--tborder)" id="slot-submit-btn" onclick="submitSlotPayment()">
+        <i class="ti ti-check"></i> تأكيد الدفع
+      </button>
+      <button class="btn btn-ghost" id="slot-undo-btn" onclick="undoSlotPayment()"
+              style="color:var(--red);display:none;border:1px solid var(--rborder);padding:12px 14px" title="إلغاء كل الشهر">
+        <i class="ti ti-rotate-left"></i>
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-slot-payment')" style="padding:12px 14px">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  </div>
+</div>
+<!-- Recalc Modal -->
+<div class="overlay" id="modal-recalc">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">
+      <i class="ti ti-alert-triangle" style="color:var(--amber)"></i>
+      تغيير في البيانات المالية
+    </div>
+
+    <div style="background:var(--abg);border:1px solid var(--aborder);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:8px">التغييرات:</div>
+      <div id="recalc-changes"></div>
+      <div style="display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid var(--aborder)">
+        <div style="text-align:center;flex:1">
+          <div style="font-size:10px;color:var(--text3)">القسط القديم</div>
+          <div style="font-weight:900;color:var(--text);font-size:15px" id="recalc-old-inst"></div>
+        </div>
+        <div style="font-size:20px;color:var(--text3);align-self:center">←</div>
+        <div style="text-align:center;flex:1">
+          <div style="font-size:10px;color:var(--text3)">القسط الجديد</div>
+          <div style="font-weight:900;color:var(--amber);font-size:15px" id="recalc-new-inst"></div>
+        </div>
+        <div style="text-align:center;flex:1">
+          <div style="font-size:10px;color:var(--text3)">المدفوع</div>
+          <div style="font-weight:900;color:var(--green);font-size:13px" id="recalc-paid-count"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:13px;font-weight:800;margin-bottom:12px">إيه تعمل بالأقساط المدفوعة؟</div>
+
+    <!-- Option 1 -->
+    <div class="recalc-option" onclick="applyRecalc('keep')" style="border-color:var(--green)">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--gbg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="ti ti-lock" style="color:var(--green)"></i>
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:900;color:var(--green)">احتفظ بالمدفوع كما هو</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">المبالغ المدفوعة تفضل زي ما هي — بس القسط الجديد بيطبّق على الشهور الجاية</div>
+      </div>
+      <i class="ti ti-chevron-left" style="color:var(--text3)"></i>
+    </div>
+
+    <!-- Option 2 -->
+    <div class="recalc-option" onclick="applyRecalc('adjust')" style="border-color:var(--blue)">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--bbg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="ti ti-adjustments" style="color:var(--blue)"></i>
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:900;color:var(--blue)">اعتبر المدفوع بالقسط الجديد</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">الشهور المدفوعة تتحسب بقيمة القسط الجديد — مناسب لو كان في غلطة في الحساب</div>
+      </div>
+      <i class="ti ti-chevron-left" style="color:var(--text3)"></i>
+    </div>
+
+    <!-- Option 3 -->
+    <div class="recalc-option" onclick="applyRecalc('reset')" style="border-color:var(--red)">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--rbg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="ti ti-refresh" style="color:var(--red)"></i>
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:900;color:var(--red)">إعادة من الصفر</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">مسح كل المدفوع والبدء من الأول بالبيانات الجديدة — مفيش رجوع!</div>
+      </div>
+      <i class="ti ti-chevron-left" style="color:var(--text3)"></i>
+    </div>
+
+    <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="closeModal('modal-recalc');openModal('modal-aq')">
+      <i class="ti ti-arrow-right"></i> رجوع للتعديل
+    </button>
+  </div>
+</div>
+
+<!-- ── Mobile Bottom Nav ────────────────────────────────── -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <button class="mbnav-item active" onclick="sidebarNav('pg-today',this)" id="mbn-today">
+    <i class="ti ti-sun"></i><span>اليوم</span>
+  </button>
+  <button class="mbnav-item" onclick="sidebarNav('pg-aqsat',this)" id="mbn-aqsat">
+    <i class="ti ti-calendar-repeat"></i><span>الأقساط</span>
+  </button>
+  <button class="mbnav-item" onclick="sidebarNav('pg-daily',this)" id="mbn-daily">
+    <i class="ti ti-file-invoice"></i><span>اليومية</span>
+  </button>
+  <button class="mbnav-item" onclick="sidebarNav('pg-home',this)" id="mbn-home">
+    <i class="ti ti-layout-dashboard"></i><span>الداشبورد</span>
+  </button>
+  <button class="mbnav-item" onclick="openSidebar()" id="mbn-more">
+    <i class="ti ti-dots"></i><span>المزيد</span>
+  </button>
+</nav>
+</div><!-- /main-area -->
+</div><!-- /app-layout -->
+</body>
+</html>
